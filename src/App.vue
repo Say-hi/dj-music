@@ -3,19 +3,24 @@
     <m-header></m-header>
     <tab></tab>
     <transition name="fade">
-      <router-view />
+      <keep-alive>
+        <router-view />
+      </keep-alive>
     </transition>
+    <player></player>
   </div>
 </template>
 
 <script>
 import MHeader from 'components/m-header/m-header'
 import Tab from 'components/tab/tab'
+import Player from 'components/player/player'
 export default {
   name: 'App',
   components: {
     MHeader,
-    Tab
+    Tab,
+    Player
   }
 }
 </script>

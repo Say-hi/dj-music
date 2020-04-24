@@ -5,11 +5,18 @@
     </div>
     <h1 class="title" v-html="title"></h1>
     <div class="bg-image" :style='bgStyle' ref='bgImage'>
-      <div class="filter"></div>
+      <div class="play-wrapper">
+        <div ref="playBtn" v-show="songs.length>0" class="play" @click="random">
+          <i class="icon-play"></i>
+          <span class="text">随机播放全部</span>
+        </div>
+      </div>
+      <div class="filter" ref='filter'></div>
     </div>
-    <scroll :data='songs' class='list' ref='list'>
+    <div class='bg-layer' ref='layer'></div>
+    <scroll @scroll='scroll' :probe-type='probeType' :listen-scroll='listenScroll'  :data='songs' class='list' ref='list'>
       <div class="song-list-wrapper">
-        <song-list :songs='songs'></song-list>
+        <song-list @select='selectItem' :songs='songs'></song-list>
       </div>
     </scroll>
   </div>
@@ -18,6 +25,8 @@
 <script>
 import Scroll from 'base/scroll/scroll'
 import SongList from 'base/song-list/song-list'
+import {mapActions} from 'vuex'
+const RESERVED_EHIGHT = 40
 export default {
   components: {
     Scroll,
@@ -42,12 +51,69 @@ export default {
       return `background-image: url(${this.bgImage});`
     }
   },
+  data() {
+    return {
+      scrollY: 0
+    }
+  },
+  created() {
+    this.probeType = 3
+    this.listenScroll = true
+  },
   mounted() {
+    this.imageHeight = this.$refs.bgImage.clientHeight
+    this.minTranslateY = -this.imageHeight + RESERVED_EHIGHT
     this.$refs.list.$el.style.top = `${this.$refs.bgImage.clientHeight}px`
   },
   methods: {
-    back () {
-      this.$router.go(-1)
+    ...mapActions([
+      'selectPlay'
+    ]),
+    random() {
+      this.randomPlay({
+        list: this.songs
+      })
+    },
+    back() {
+      this.$router.back()
+    },
+    scroll(pos) {
+      this.scrollY = pos.y
+    },
+    selectItem (item, index) {
+      this.selectPlay({list: this.songs, index})
+    }
+  },
+  watch: {
+    scrollY(newVal) {
+      let translateY = Math.max(this.minTranslateY, newVal)
+      let zIndex = 0
+      let scale = 1
+      let blur = 0
+      this.$refs.layer.style['transform'] = `translate3d(0, ${translateY}px, 0)`
+      this.$refs.layer.style['webkitTransform'] = `translate3d(0, ${translateY}px, 0)`
+      const percent = Math.abs(newVal / this.imageHeight)
+      if (newVal > 0) {
+        scale = 1 + percent
+        zIndex = 10
+      } else {
+        blur = Math.min(20 * percent, 20)
+      }
+      this.$refs.filter.style['backdrop-filter'] = `blur(${blur}px)`
+      this.$refs.filter.style['webkitBackdrop-filter'] = `blur(${blur}px)`
+      if (newVal < this.minTranslateY) {
+        zIndex = 10
+        this.$refs.bgImage.style.paddingTop = 0
+        this.$refs.bgImage.style.height = `${RESERVED_EHIGHT}px`
+        this.$refs.playBtn.style.display = 'none'
+      } else {
+        this.$refs.bgImage.style.paddingTop = '70%'
+        this.$refs.bgImage.style.height = 0
+        this.$refs.playBtn.style.display = 'block'
+      }
+      this.$refs.bgImage.style.zIndex = zIndex
+      this.$refs.bgImage.style['transform'] = `scale(${scale})`
+      this.$refs.bgImage.style['webkitTransform'] = `scale(${scale})`
     }
   }
 }
@@ -93,7 +159,7 @@ export default {
     padding-top: 70%
     transform-origin: top
     background-size: cover
-    z-index: 35
+    // z-index: 35
     .play-wrapper
       position: absolute
       bottom: 20px
