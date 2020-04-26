@@ -15,7 +15,7 @@
         <div class="middle">
           <div class="middle-l">
             <div class="cd-wrapper" ref='cdWrapper'>
-              <div class="cd">
+              <div class="cd" :class='cdCls'>
                 <img class="image" :src='currentSong.image'>
               </div>
             </div>
@@ -30,7 +30,7 @@
               <i class="icon-prev"></i>
             </div>
             <div class="icon i-center">
-              <i class="icon-play"></i>
+              <i @click="togglePlaying" :class="playIcon"></i>
             </div>
             <div class="icon i-right">
               <i class="icon-next"></i>
@@ -44,14 +44,16 @@
     </transition>
     <transition name='mini'>
       <div @click='open' class="mini-player" v-show='!fullScreen'>
-        <div class="icon">
-          <img width='40' height='40' :src='currentSong.image'>
+        <div class="icon" >
+          <img :class='cdCls' width='40' height='40' :src='currentSong.image'>
         </div>
         <div class="text">
           <h2 class="name" v-html='currentSong.name'></h2>
           <p class="desc" v-html='currentSong.singer'></p>
         </div>
-        <div class="control"></div>
+        <div class="control">
+          <i @click.stop="togglePlaying" :class="miniIcon"></i>
+        </div>
         <div class="control">
           <i class="icon-playlist"></i>
         </div>
@@ -71,13 +73,27 @@ export default {
     ...mapGetters([
       'fullScreen',
       'playList',
-      'currentSong'
-    ])
+      'currentSong',
+      'playing'
+    ]),
+    cdCls () {
+      return this.playing ? 'play' : 'play pause'
+    },
+    playIcon() {
+      return this.playing ? 'icon-pause' : 'icon-play'
+    },
+    miniIcon () {
+      return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
+    }
   },
   methods: {
     ...mapMutations({
-      setFullScreen: 'SET_FULL_SCREEN'
+      setFullScreen: 'SET_FULL_SCREEN',
+      setPlayingState: 'SET_PLAYING_STATE'
     }),
+    togglePlaying () {
+      this.setPlayingState(!this.playing)
+    },
     back () {
       this.setFullScreen(false)
     },
@@ -141,6 +157,12 @@ export default {
     currentSong () {
       this.$nextTick(() => {
         this.$refs.audio.play()
+      })
+    },
+    playing(newVal) {
+      const audio = this.$refs.audio
+      this.$nextTick(() => {
+        newVal ? audio.play() : audio.pause()
       })
     }
   }
@@ -230,10 +252,10 @@ export default {
                 box-sizing: border-box
                 border-radius: 50%
                 border: 10px solid rgba(255, 255, 255, 0.1)
-              .play
-                animation: rotate 20s linear infinite
-              .pause
-                animation-play-state: paused
+            .play
+              animation: rotate 20s linear infinite
+            .pause
+              animation-play-state: paused
           .playing-lyric-wrapper
             width: 80%
             margin: 30px auto 0 auto
@@ -356,12 +378,12 @@ export default {
         .imgWrapper
           height: 100%
           width: 100%
-          img
-            border-radius: 50%
-            &.play
-              animation: rotate 10s linear infinite
-            &.pause
-              animation-play-state: paused  // 动画暂停
+        img
+          border-radius: 50%
+          &.play
+            animation: rotate 10s linear infinite
+          &.pause
+            animation-play-state: paused  // 动画暂停
       .text
         display: flex
         flex-direction: column
