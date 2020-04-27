@@ -80,6 +80,8 @@ import ProgressBar from 'base/progress-bar/progress-bar'
 import ProgressCircle from 'base/progress-circle/progress-circle'
 import {playMode} from 'common/js/config'
 import {shuffle} from 'common/js/util'
+// import Lyric from 'lyric-parser'
+import Lyric from 'common/js/lyric'
 const transform = prefixStyle('transform')
 export default {
   data () {
@@ -275,8 +277,17 @@ export default {
     }
   },
   watch: {
-    currentSong (newSong, oldSong) {
-      newSong.id !== oldSong.id && this.$nextTick(() => { this.$refs.audio.play() })
+    async currentSong (newSong, oldSong) {
+      if (newSong.id !== oldSong.id) {
+        if (!newSong.pl) {
+          this.songReady = true
+          return this.next()
+        }
+        this.$nextTick(() => { this.$refs.audio.play() })
+        let lyric = await this.currentSong.getLyric()
+        let a = new Lyric(lyric.data.lrc.lyric)
+        console.log(a)
+      }
     },
     playing(newVal) {
       const audio = this.$refs.audio

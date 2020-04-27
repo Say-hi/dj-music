@@ -7,3 +7,6 @@ export function getSinger () {
 export function getSingerDetail (id) {
   return config.axios.get(`${config.baseUrl}/artists?id=${id}`)
 }
+export function getSongLyric (id) {
+  return config.axios.get(`${config.baseUrl}/lyric?id=${id}`)
+}

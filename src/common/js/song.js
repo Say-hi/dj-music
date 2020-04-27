@@ -1,5 +1,6 @@
+import {getSongLyric} from 'api/singer'
 export default class Song {
-  constructor({id, mid, singer, name, album, duration, image, url}) {
+  constructor({id, mid, singer, name, album, duration, image, url, pl}) {
     this.id = id
     this.mid = mid
     this.singer = singer
@@ -8,6 +9,10 @@ export default class Song {
     this.duration = duration
     this.image = image
     this.url = url
+    this.pl = pl
+  }
+  getLyric () {
+    return getSongLyric(this.id)
   }
 }
 
@@ -20,6 +25,7 @@ export function createSong(musicData) {
     album: musicData.al.name,
     duration: musicData.dt / 1000,
     image: musicData.al.picUrl,
+    pl: musicData.privilege.pl,
     url: `https://music.163.com/song/media/outer/url?id=${musicData.id}.mp3`
   })
 }

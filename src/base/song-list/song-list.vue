@@ -1,7 +1,7 @@
 <template>
   <div class="song-list">
     <ul>
-      <li @click="selectItem(song, index)" class="item" v-for="(song, index) in songs" :key='index'>
+      <li @click.stop="!song.pl ? noPlay() : selectItem(song, index)" class="item" v-for="(song, index) in songs" :key='index'>
         <div class="rank" v-show="rank">
           <span :class="getRankCls(index)" v-text="getRankText(index)"></span>
         </div>
@@ -29,6 +29,9 @@ export default {
   methods: {
     selectItem(item, index) {
       this.$emit('select', item, index)
+    },
+    noPlay() {
+      alert('受版权方限制,该歌曲暂时无法播放')
     },
     getDesc(song) {
       return `${song.singer}·${song.album}`
