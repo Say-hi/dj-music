@@ -8,7 +8,7 @@
       <div class="play-wrapper">
         <div ref="playBtn" v-show="songs.length>0" class="play" @click="random">
           <i class="icon-play"></i>
-          <span class="text">随机播放全部</span>
+          <span  class="text">随机播放全部</span>
         </div>
       </div>
       <div class="filter" ref='filter'></div>
@@ -16,6 +16,7 @@
     <div class='bg-layer' ref='layer'></div>
     <scroll @scroll='scroll' :probe-type='probeType' :listen-scroll='listenScroll'  :data='songs' class='list' ref='list'>
       <div class="song-list-wrapper">
+        <loading v-if='!songs.length'></loading>
         <song-list @select='selectItem' :songs='songs'></song-list>
       </div>
     </scroll>
@@ -67,7 +68,8 @@ export default {
   },
   methods: {
     ...mapActions([
-      'selectPlay'
+      'selectPlay',
+      'randomPlay'
     ]),
     random() {
       this.randomPlay({
