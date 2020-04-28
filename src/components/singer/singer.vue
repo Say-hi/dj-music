@@ -1,7 +1,7 @@
 <template>
-  <div class="singer">
+  <div class="singer" ref='singer'>
     <loading v-if='!singers.length'></loading>
-    <list-view @select='selectSinger' :data='singers'></list-view>
+    <list-view ref='listView' @select='selectSinger' :data='singers'></list-view>
     <transition name='slide'>
       <router-view></router-view>
     </transition>
@@ -13,10 +13,14 @@ import {getSinger} from 'api/singer'
 import pinyin from 'js-pinyin'
 import ListView from 'base/listview/listview'
 import {mapMutations} from 'vuex'
+import {playlistMixin} from 'common/js/mixin'
 // import Singer from 'common/js/singer'
 const HOT_NAME = '热门'
 const HOT_SINGER_NUM = 10
 export default {
+  mixins: [
+    playlistMixin
+  ],
   components: {
     ListView
   },
@@ -29,6 +33,11 @@ export default {
     this._getSingerList()
   },
   methods: {
+    handlePlaylist (playList) {
+      const bottom = playList.length > 0 ? '60px' : ''
+      this.$refs.singer.style.bottom = bottom
+      this.$refs.listView.refresh()
+    },
     selectSinger (singer) {
       this.$router.push({
         path: `/singer/${singer.id}`

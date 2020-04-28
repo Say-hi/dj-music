@@ -13,7 +13,7 @@
           <h2 class="subtitle" v-html='currentSong.singer'></h2>
         </div>
         <div class="middle" @touchmove.prevent='middleTouchMove' @touchend='middleTouchEnd' @touchstart.prevent='middleTouchStart'>
-          <div class="middle-l">
+          <div class="middle-l" ref='middleL'>
             <div class="cd-wrapper" ref='cdWrapper'>
               <div class="cd" :class='cdCls'>
                 <img class="image" :src='currentSong.image'>
@@ -80,6 +80,9 @@
       </div>
     </transition>
     <audio @timeupdate="updateTime" ref='audio' @ended="end" @canplay="ready" @error='error' :src="currentSong.url"></audio>
+    <div v-if='noPlay' class="no-play">
+      <span class='no-play-text'>因受版权方的保护，该歌曲咱不能提供免费播放.为您切换下一首歌曲</span>
+    </div>
   </div>
 </template>
 
@@ -104,7 +107,8 @@ export default {
       radius: 32,
       currentLyric: null,
       currentLineIndex: 0,
-      currentShow: 'cd'
+      currentShow: 'cd',
+      noPlay: false
     }
   },
   components: {
@@ -150,12 +154,15 @@ export default {
       setPlayMode: 'SET_PLAY_MODE'
     }),
     middleTouchStart(e) {
-      this.touch.initiated = true
+      // console.log('start', e)
+      this.touch.initiated = false
       const touch = e.touches[0]
       this.touch.startX = touch.pageX
       this.touch.startY = touch.pageY
     },
     middleTouchMove(e) {
+      // console.log('move', e)
+      this.touch.initiated = true
       if (!this.touch.initiated) return
       const touch = e.touches[0]
       const deltaX = touch.pageX - this.touch.startX
@@ -166,26 +173,37 @@ export default {
       this.touch.percent = Math.abs(offsetWidth / window.innerWidth)
       this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px, 0, 0)`
       this.$refs.lyricList.$el.style[transitionDuration] = '0'
+      this.$refs.middleL.style.opacity = 1 - this.touch.percent
+      this.$refs.middleL.style[transitionDuration] = '0'
     },
-    middleTouchEnd() {
+    middleTouchEnd(e) {
+      if (!this.touch.initiated) return
+      // console.log('end', e)
       let offsetWidth = 0
+      let opacity = 0
       if (this.currentShow === 'cd') {
         if (this.touch.percent > 0.1) {
           offsetWidth = -window.innerWidth
+          opacity = 0
           this.currentShow = 'lyric'
         } else {
           offsetWidth = 0
+          opacity = 1
         }
       } else {
         if (this.touch.percent < 0.9) {
           offsetWidth = 0
           this.currentShow = 'cd'
+          opacity = 1
         } else {
           offsetWidth = -window.innerWidth
+          opacity = 0
         }
       }
       this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px, 0, 0)`
       this.$refs.lyricList.$el.style[transitionDuration] = '300ms'
+      this.$refs.middleL.style[transitionDuration] = '300ms'
+      this.$refs.middleL.style.opacity = opacity
     },
     currentNum () {
       let that = this
@@ -252,9 +270,14 @@ export default {
     },
     ready () {
       this.songReady = true
+      this.noPlay = false
     },
     error () {
       this.songReady = true
+      this.noPlay = true
+      setTimeout(() => {
+        this.next()
+      }, 1000)
     },
     next () {
       if (!this.songReady) return
@@ -382,7 +405,25 @@ export default {
 <style scoped lang='stylus'>
 @import "~common/stylus/variable"
 @import "~common/stylus/mixin"
-
+  .no-play
+    position fixed
+    top 40px
+    left 0
+    bottom 0
+    right 0
+    text-align center
+    font-size 30px
+    font-weight 700
+    color #0094ff
+    background rgba(0,0,0,0.5)
+    z-index 151
+    .no-play-text
+      position absolute
+      width 90%
+      line-height 40px
+      top 50%
+      left 50%
+      transform translate(-50%, -50%)
   .player
     .normal-player
       position: fixed

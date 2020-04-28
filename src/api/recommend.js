@@ -8,3 +8,7 @@ export async function getRecommend () {
 export function getDiscList () {
   return config.axios.get(`${config.baseUrl}/top/playlist`)
 }
+
+export function getDiscDetail (id) {
+  return config.axios.get(`${config.baseUrl}/playlist/detail?id=${id}`)
+}

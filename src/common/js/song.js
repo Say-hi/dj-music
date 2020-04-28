@@ -25,7 +25,7 @@ export function createSong(musicData) {
     album: musicData.al.name,
     duration: musicData.dt / 1000,
     image: musicData.al.picUrl,
-    pl: musicData.privilege.pl,
+    pl: musicData.privilege ? musicData.privilege.pl : 12800,
     url: `https://music.163.com/song/media/outer/url?id=${musicData.id}.mp3`
   })
 }

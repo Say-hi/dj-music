@@ -1,14 +1,7 @@
 <template>
-  <div class="recommend">
+  <div class="recommend" ref='recommend'>
     <scroll ref='scroll' :data='discList' class="recommend-content">
       <div>
-        <!-- <div v-if='recommends.length' class="slider-wrapper">
-          <swiper>
-            <slide v-for='item in recommends' :key='item.bannerId'>
-              <img style='width: 100%;' :src="item.pic" alt="">
-            </slide>
-          </swiper>
-        </div> -->
         <div v-if='recommends.length' class='slider-wrapper'>
           <slider>
             <div v-for='item in recommends' :key='item.bannerId'>
@@ -21,7 +14,7 @@
         <div class="recommend-list">
           <h1 class="list-title">热门歌单推荐</h1>
           <ul>
-            <li v-for='item in discList' :key='item.id' class='item'>
+            <li @click="selectItem(item)" v-for='item in discList' :key='item.id' class='item'>
               <div class="icon">
                 <img style='width: 100%;' v-lazy="item.coverImgUrl" alt="">
               </div>
@@ -37,6 +30,7 @@
           <loading v-if='!discList.length'></loading>
       </div>
     </scroll>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -45,7 +39,12 @@ import Slider from 'base/slider/slider'
 import {getRecommend, getDiscList} from 'api/recommend'
 import {Swiper, Slide} from 'vue-swiper-component'
 import Scroll from 'base/scroll/scroll'
+import {playlistMixin} from 'common/js/mixin'
+import {mapMutations} from 'vuex'
 export default {
+  mixins: [
+    playlistMixin
+  ],
   components: {
     Slider,
     Swiper,
@@ -59,6 +58,20 @@ export default {
     }
   },
   methods: {
+    ...mapMutations({
+      setDisc: 'SET_DISC'
+    }),
+    selectItem (item) {
+      this.$router.push({
+        path: `/recommend/${item.id}`
+      }).catch(() => {})
+      this.setDisc(item)
+    },
+    handlePlaylist (playList) {
+      const bottom = playList.length > 0 ? '60px' : ''
+      this.$refs.recommend.style.bottom = bottom
+      this.$refs.scroll.refresh()
+    },
     async _getRecommend() {
       let res = await getRecommend()
       this.recommends = res.data.banners
