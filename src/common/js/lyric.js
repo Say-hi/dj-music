@@ -9,16 +9,15 @@ export default class Lyric {
   }
   _init () {
     // 生成歌词数组
-    // console.log(this.lyric)
     this.lyricArr = this.lyric.split('\n')
     this.lyricArr.map(item => {
       let timeArr = item.match(timeREG)
       if (timeArr) {
-        let text = item.replace(timeREG, '')
+        let txt = item.replace(timeREG, '')
         for (let v of timeArr) {
           this.lines.push({
             time: this._calculateTime(v),
-            text
+            txt
           })
         }
       }
@@ -26,16 +25,18 @@ export default class Lyric {
     this.lines.sort((a, b) => a.time - b.time)
   }
   _createTimeStr(time) {
+    // 创建时间字符串
     let str = time.replace(/[[,\]]/g, '')
     return str
   }
   _calculateTime(timeStr) {
+    // 计算返回毫秒数
     let str = this._createTimeStr(timeStr)
     let temp1 = str.split('.')
     let temp2 = temp1[0].split(':')
     let m = temp2[0] * 60 * 1000
     let s = temp2[1] * 1000
-    let ms = temp1[1] * 10
+    let ms = ('0.' + temp1[1]) * 1000
     return m + s + ms
   }
 }
