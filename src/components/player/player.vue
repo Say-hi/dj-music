@@ -44,13 +44,13 @@
             <div class="icon i-left">
               <i @click="changeMode" :class="iconMode"></i>
             </div>
-            <div class="icon i-left" :class='disableCls'>
-              <i @click="prev" class="icon-prev"></i>
+            <div v-if='playList.length > 1' class="icon i-left" :class='disableCls'>
+              <i  @click="prev" class="icon-prev"></i>
             </div>
             <div class="icon i-center" :class='disableCls'>
               <i @click="togglePlaying" :class="playIcon"></i>
             </div>
-            <div class="icon i-right" :class='disableCls'>
+            <div v-if='playList.length > 1' class="icon i-right" :class='disableCls'>
               <i @click="next" class="icon-next"></i>
             </div>
             <div class="icon i-right">
@@ -366,7 +366,7 @@ export default {
     },
     async getLyric () {
       let lyric = await this.currentSong.getLyric()
-      this.currentLyric = new Lyric(lyric.data.lrc.lyric)
+      this.currentLyric = new Lyric(lyric.data.nolyric ? '[00:00.000]暂无歌词' : lyric.data.lrc.lyric)
     }
   },
   watch: {

@@ -4,10 +4,10 @@
       <div>
         <div v-if='recommends.length' class='slider-wrapper'>
           <slider>
-            <div v-for='item in recommends' :key='item.bannerId'>
-              <a href="http://vue.jiangwenqiang.com/">
-                <img class='needsclick' @load="loadImage" :src="item.pic" alt="">
-              </a>
+            <div @click="selectNav(item)" v-for='item in recommends' :key='item.bannerId'>
+              <!-- <a href="http://vue.jiangwenqiang.com/"> -->
+                <img class='needsclick' @load="loadImage" :src="item.pic" >
+              <!-- </a> -->
             </div>
           </slider>
         </div>
@@ -39,8 +39,9 @@ import Slider from 'base/slider/slider'
 import {getRecommend, getDiscList} from 'api/recommend'
 import {Swiper, Slide} from 'vue-swiper-component'
 import Scroll from 'base/scroll/scroll'
+import {createSong} from 'common/js/song'
 import {playlistMixin} from 'common/js/mixin'
-import {mapMutations} from 'vuex'
+import {mapMutations, mapActions} from 'vuex'
 export default {
   mixins: [
     playlistMixin
@@ -54,13 +55,25 @@ export default {
   data () {
     return {
       recommends: [],
-      discList: []
+      discList: [],
+      flag: false
     }
   },
   methods: {
     ...mapMutations({
       setDisc: 'SET_DISC'
     }),
+    ...mapActions([
+      'selectPlay'
+    ]),
+    selectNav (item) {
+      if (this.flag) return
+      this.flag = true
+      setTimeout(() => {
+        this.flag = false
+      }, 1000)
+      this.selectPlay({list: [createSong(item.song)], index: 0})
+    },
     selectItem (item) {
       this.$router.push({
         path: `/recommend/${item.id}`
