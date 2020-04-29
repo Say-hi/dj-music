@@ -3,7 +3,7 @@
     <transition name='normal' @enter='enter' @after-enter='afterEnter' @leave='leave' @after-leave='afterLeave'>
       <div class="normal-player" v-show='fullScreen'>
         <div class="background">
-          <img width='100%' height="100%" :src='currentSong.image'>
+          <img width='100%' height="100%" v-lazy='currentSong.image'>
         </div>
         <div class="top">
           <div class="back" @click="back">
@@ -12,11 +12,11 @@
           <h1 class="title" v-html='currentSong.name'></h1>
           <h2 class="subtitle" v-html='currentSong.singer'></h2>
         </div>
-        <div class="middle" @touchmove.prevent='middleTouchMove' @touchend='middleTouchEnd' @touchstart.prevent='middleTouchStart'>
+        <div class="middle" @mousedown="middleTouchStart" @mousemove="middleTouchMove" @mouseup="middleTouchEnd" @touchmove.prevent='middleTouchMove' @touchend='middleTouchEnd' @touchstart.prevent='middleTouchStart'>
           <div class="middle-l" ref='middleL'>
             <div class="cd-wrapper" ref='cdWrapper'>
               <div class="cd" :class='cdCls'>
-                <img class="image" :src='currentSong.image'>
+                <img class="image" v-lazy='currentSong.image'>
               </div>
             </div>
           </div>
@@ -156,7 +156,11 @@ export default {
     middleTouchStart(e) {
       // console.log('start', e)
       this.touch.initiated = false
-      const touch = e.touches[0]
+      this.touch.pcInitiated = true
+      const touch = e.touches ? e.touches[0] : {
+        pageX: e.pageX,
+        pageY: e.pageY
+      }
       this.touch.startX = touch.pageX
       this.touch.startY = touch.pageY
     },
@@ -164,7 +168,11 @@ export default {
       // console.log('move', e)
       this.touch.initiated = true
       if (!this.touch.initiated) return
-      const touch = e.touches[0]
+      if (!e.touches && !this.touch.pcInitiated) return
+      const touch = e.touches ? e.touches[0] : {
+        pageX: e.pageX,
+        pageY: e.pageY
+      }
       const deltaX = touch.pageX - this.touch.startX
       const deltaY = touch.pageY - this.touch.startY
       if (Math.abs(deltaY) > Math.abs(deltaX)) return
@@ -177,6 +185,7 @@ export default {
       this.$refs.middleL.style[transitionDuration] = '0'
     },
     middleTouchEnd(e) {
+      this.touch.pcInitiated = false
       if (!this.touch.initiated) return
       // console.log('end', e)
       let offsetWidth = 0

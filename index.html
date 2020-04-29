@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html >
 
 <head>
   <meta charset="utf-8">
@@ -8,9 +8,64 @@
   <title>如果我是DJ,你会爱我么</title>
 </head>
 
-<body>
-  <div id="app"></div>
+<body >
+  <!-- <a href=# onClick="javascript:window.open('http://www.baidu.com','','width=632,height=388,toolbar=no, status=no, menubar=no, resizable=yes, scrollbars=yes');return false;">链接地址</a> -->
+  <div id="app" ></div>
   <!-- built files will be auto injected -->
 </body>
 
 </html>
+<script>
+document.ready = function (callback) {
+///兼容FF,Google
+if (document.addEventListener) {
+document.addEventListener('DOMContentLoaded', function () {
+document.removeEventListener('DOMContentLoaded', arguments.callee, false);
+callback();
+}, false)
+}
+//兼容IE
+else if (document.attachEvent) {
+document.attachEvent('onreadytstatechange', function () {
+if (document.readyState == "complete") {
+document.detachEvent("onreadystatechange", arguments.callee);
+callback();
+}
+})
+}
+else if (document.lastChild == document.body) {
+callback();
+}
+}
+var userAgent = navigator.userAgent;
+function getUrlKey(name) {
+  return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
+}
+
+function closeWindow(){
+  // var userAgent = navigator.userAgent;
+	if (userAgent.indexOf("Firefox") != -1 || userAgent.indexOf("Chrome") !=-1) {
+			window.location.href="about:blank";
+			window.close();
+	} else {
+			window.opener = null;
+			window.open("", "_self");
+			window.close();
+	}
+}
+document.ready(function () {
+  // var userAgent = navigator.userAgent;
+  var host = window.location.host
+  if (getUrlKey('flag')) {
+
+  } else {
+    if (userAgent.match(/MicroMessenger/i) != 'MicroMessenger') {
+      window.open('http://' + host + '?flag=true','','width=414,height=736,toolbar=no, status=no, menubar=no, resizable=yes, scrollbars=yes')
+    // window.open('http://localhost:8080?flag=true','','width=414,height=736,toolbar=no, status=no, menubar=no, resizable=yes, scrollbars=yes')
+      closeWindow()
+    } else {
+      console.log(123)
+    }
+  }
+})
+</script>
