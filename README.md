@@ -1,7 +1,7 @@
 # music
 
 >在线音乐项目
-在线体验地址: http://dj.jiangwenqiang.com
+在线体验地址: http://dj.jiangwenqiang.com F12开启手机模式获得更加体验
 ## Build Setup
 
 ``` bash
