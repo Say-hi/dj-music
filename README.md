@@ -1,7 +1,7 @@
 # music
 
-> A Vue.js project
-
+>在线音乐项目
+在线体验地址: http://dj.jiangwenqiang.com
 ## Build Setup
 
 ``` bash
@@ -18,4 +18,5 @@ npm run build
 npm run build --report
 ```
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+## Demo
+http://dj.jiangwenqiang.com
