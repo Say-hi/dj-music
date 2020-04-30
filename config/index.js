@@ -11,10 +11,10 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      // '/': {
-      //   target: 'http://music.jiangwenqiang.com',
-      //   changeOrigin: true
-      // }
+      '/': {
+        target: 'http://music.jiangwenqiang.com',
+        changeOrigin: true
+      }
     },
 
     // Various Dev Server settings
