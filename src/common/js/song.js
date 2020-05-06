@@ -19,12 +19,12 @@ export default class Song {
 export function createSong(musicData) {
   return new Song({
     id: musicData.id,
-    mid: musicData.al.id,
-    singer: filterSinger(musicData.ar),
+    mid: musicData.al ? musicData.al.id : musicData.album.id,
+    singer: filterSinger(musicData.ar || musicData.artists),
     name: musicData.name,
-    album: musicData.al.name,
-    duration: musicData.dt / 1000,
-    image: musicData.al.picUrl,
+    album: musicData.al ? musicData.al.name : musicData.album.name,
+    duration: musicData.dt / 1000 || musicData.duration / 1000,
+    image: musicData.al ? musicData.al.picUrl : musicData.album.artist.img1v1Url,
     pl: musicData.privilege ? musicData.privilege.pl : 12800,
     url: `https://music.163.com/song/media/outer/url?id=${musicData.id}.mp3`
   })

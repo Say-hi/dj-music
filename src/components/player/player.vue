@@ -290,6 +290,11 @@ export default {
     },
     next () {
       if (!this.songReady) return
+      if (this.noPlay && this.playList.length <= 1) {
+        this.noPlay = false
+        this.setFullScreen(false)
+        return this.$router.back()
+      }
       let index = this.currentIndex + 1
       if (index === this.playList.length) {
         index = 0
